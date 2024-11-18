@@ -1,6 +1,6 @@
-# Crawly
+# Crawly Automation
 
-**Crawly** is a lightweight, modular, and extensible web crawling framework built on top of Puppeteer. Whether you need to scrape data, automate browser interactions, or manage multiple requests efficiently, Crawly is here to simplify the process.
+**Crawly Automation** is a lightweight, modular, and extensible web crawling framework built on top of Puppeteer. Whether you need to scrape data, automate browser interactions, or manage multiple requests efficiently, Crawly is here to simplify the process.
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "name": "crawly",
+  "name": "crawly-automation",
   "version": "1.0.0",
   "description": "A lightweight and modular web crawling framework built with Puppeteer.",
   "main": "dist/index.js",
@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "crawly": "file:crawly-1.0.0.tgz",
+    "crawly-automation": "file:crawly-automation-1.0.0.tgz",
+    "crawly-js": "file:crawly-js-1.0.0.tgz",
     "puppeteer": "^23.8.0"
   }
 }
