@@ -19,7 +19,7 @@
 Install Crawly via NPM:
 
 ```bash
-npm install crawly
+npm install crawly-automation
 ```
 
 ---
@@ -217,5 +217,5 @@ If you find this project helpful, please give it a ⭐ on GitHub!
 For quick installation, just run:
 
 ```bash
-npm install crawly
+npm install crawly-automation
 ```
