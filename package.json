@@ -1,0 +1,33 @@
+{
+  "name": "crawly",
+  "version": "1.0.0",
+  "description": "A lightweight and modular web crawling framework built with Puppeteer.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "crawling",
+    "puppeteer",
+    "web scraping",
+    "automation",
+    "browser automation"
+  ],
+  "author": "Afshin Tavakolian <afsh7n@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/puppeteer": "^7.0.4",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "crawly": "file:crawly-1.0.0.tgz",
+    "puppeteer": "^23.8.0"
+  }
+}
