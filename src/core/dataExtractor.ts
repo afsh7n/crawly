@@ -1,4 +1,5 @@
 import { Page } from 'puppeteer';
+import { toCSV, toJSON } from '../utils/dataFormatter';
 
 /**
  * A utility class for extracting data from a Puppeteer page.
@@ -45,6 +46,25 @@ export class DataExtractor {
         }
 
         return transformFn ? transformFn(data) : data;
+    }
+
+    /**
+     * Extracts data and formats it into the desired format.
+     * @param page - The Puppeteer page instance.
+     * @param format - The output format ('json' or 'csv').
+     * @returns The formatted data as a string.
+     */
+    async extractFormatted(
+        page: Page,
+        format: 'json' | 'csv' = 'json'
+    ): Promise<string> {
+        const data = await this.extract(page);
+        if (format === 'json') return toJSON(data);
+        if (format === 'csv') {
+            if (Array.isArray(data)) return toCSV(data);
+            throw new Error('CSV formatting requires an array of objects.');
+        }
+        throw new Error(`Unsupported format: ${format}`);
     }
 
     /**

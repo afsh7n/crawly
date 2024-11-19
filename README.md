@@ -1,6 +1,6 @@
 # Crawly Automation
 
-**Crawly Automation** is a lightweight, modular, and extensible web crawling framework built on top of Puppeteer. Whether you need to scrape data, automate browser interactions, or manage multiple requests efficiently, Crawly is here to simplify the process.
+**Crawly Automation** is a lightweight, modular, and extensible web crawling framework built on top of Puppeteer. Whether you need to scrape data, automate browser interactions, or manage multiple requests efficiently, Crawly Automation simplifies the process.
 
 ---
 
@@ -16,7 +16,7 @@
 
 ## 📦 Installation
 
-Install Crawly via NPM:
+Install Crawly Automation via NPM:
 
 ```bash
 npm install crawly-automation
@@ -26,14 +26,14 @@ npm install crawly-automation
 
 ## 🔧 Usage
 
-Here’s a quick guide to get you started with Crawly.
+Here’s a quick guide to get you started with Crawly Automation.
 
 ### **1. Browser Management**
 
 Launch a browser, create a page, and navigate to a URL:
 
 ```typescript
-import { BrowserManager } from 'crawly';
+import { BrowserManager } from 'crawly-automation';
 
 (async () => {
   const browserManager = new BrowserManager();
@@ -55,14 +55,22 @@ import { BrowserManager } from 'crawly';
 Extract data from a webpage using selectors:
 
 ```typescript
-import { DataExtractor } from 'crawly';
+import { DataExtractor } from 'crawly-automation';
 
 (async () => {
+  const browserManager = new BrowserManager();
+  const browser = await browserManager.launchBrowser();
+  const page = await browserManager.createPage();
+
+  await page.goto('https://example.com');
+
   const extractor = new DataExtractor();
   extractor.addSelector('title', 'h1').addSelector('paragraphs', 'p', true);
 
   const data = await extractor.extract(page);
   console.log('Extracted Data:', data);
+
+  await browserManager.closeBrowser();
 })();
 ```
 
@@ -82,15 +90,21 @@ Simulate user interactions like logging in or uploading a file:
 
 #### **Single-Page Login**
 ```typescript
-import { UserActions } from 'crawly';
+import { UserActions } from 'crawly-automation';
 
 (async () => {
+  const browserManager = new BrowserManager();
+  const browser = await browserManager.launchBrowser();
+  const page = await browserManager.createPage();
+
   const userActions = new UserActions(page);
 
   await userActions.login('#username', '#password', '#submit', {
     username: 'user@example.com',
-    password: 'securepassword'
+    password: 'securepassword',
   });
+
+  await browserManager.closeBrowser();
 })();
 ```
 
@@ -117,9 +131,13 @@ await userActions.uploadFile('#file-input', './path/to/file.png');
 Intercept and analyze network requests:
 
 ```typescript
-import { RequestManager } from 'crawly';
+import { RequestManager } from 'crawly-automation';
 
 (async () => {
+  const browserManager = new BrowserManager();
+  const browser = await browserManager.launchBrowser();
+  const page = await browserManager.createPage();
+
   const requestManager = new RequestManager(page);
   await requestManager.interceptRequests();
 
@@ -129,6 +147,8 @@ import { RequestManager } from 'crawly';
   // Get all captured requests
   const requests = requestManager.getRequests();
   console.log('Captured Requests:', requests);
+
+  await browserManager.closeBrowser();
 })();
 ```
 
@@ -140,7 +160,7 @@ import { RequestManager } from 'crawly';
 Use the built-in `Logger` utility for structured logs:
 
 ```typescript
-import { Logger } from 'crawly';
+import { Logger } from 'crawly-automation';
 
 Logger.info('This is an informational message.');
 Logger.error('An error occurred.');
@@ -151,7 +171,7 @@ Logger.debug('Debugging message (only visible if DEBUG=true).');
 Add custom delays between actions:
 
 ```typescript
-import { delay } from 'crawly';
+import { delay } from 'crawly-automation';
 
 await delay(3000); // Wait for 3 seconds
 ```
@@ -202,7 +222,7 @@ GitHub: [AfshinTavakolian](https://github.com/afsh7n)
 ## ❤️ Contributions
 
 Contributions, issues, and feature requests are welcome!  
-Feel free to check the [issues page](https://github.com/afsh7n/crawly/issues).
+Feel free to check the [issues page](https://github.com/afsh7n/crawly-automation/issues).
 
 ---
 

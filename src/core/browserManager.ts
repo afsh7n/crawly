@@ -1,6 +1,7 @@
 import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { saveCookies, loadCookies } from '../utils/cookies';
 
 const execPromise = promisify(exec);
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -134,5 +135,23 @@ export class BrowserManager {
      */
     isBrowserLaunched(): boolean {
         return this.browser !== null;
+    }
+
+    /**
+     * Saves cookies from the current page to a file.
+     * @param page - The Puppeteer page instance.
+     * @param filePath - Path to save the cookies file.
+     */
+    async saveCookies(page: Page, filePath: string): Promise<void> {
+        await saveCookies(page, filePath);
+    }
+
+    /**
+     * Loads cookies from a file and sets them on the current page.
+     * @param page - The Puppeteer page instance.
+     * @param filePath - Path to the cookies file.
+     */
+    async loadCookies(page: Page, filePath: string): Promise<void> {
+        await loadCookies(page, filePath);
     }
 }
