@@ -1,10 +1,15 @@
-import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
+import  { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import RecaptchaPlugin from 'puppeteer-extra-plugin-recaptcha';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { saveCookies, loadCookies } from '../utils/cookies';
 
 const execPromise = promisify(exec);
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+puppeteer.use(StealthPlugin()); // Enables stealth mode to bypass Anti-Bot
 
 /**
  * A utility class for managing Puppeteer browser instances and pages.
@@ -14,6 +19,7 @@ export class BrowserManager {
     private pages: Page[] = [];
     private manageErrors: boolean;
     private delayTime: number = 3000;
+    private recaptchaConfig: { id: string; token: string } | null = null;
 
     /**
      * Initializes the BrowserManager.
@@ -71,12 +77,24 @@ export class BrowserManager {
      * @returns The launched Puppeteer browser instance.
      */
     async launchBrowser(options: PuppeteerLaunchOptions): Promise<Browser> {
-        if (this.manageErrors) {
-            await this.initPuppeteer(options);
-        } else {
-            this.browser = await puppeteer.launch(options);
+        const defaultOptions: PuppeteerLaunchOptions = {
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        };
+
+        // Combine default options with user-provided options
+        const finalOptions = {
+            ...defaultOptions,
+            ...options, // User options will overwrite defaults if there's a conflict
+        };
+
+        try {
+            this.browser = await puppeteer.launch(finalOptions);
+            console.log('Browser launched with options:', finalOptions);
+            return this.browser;
+        } catch (error) {
+            throw new Error(`Failed to launch browser: ${(error as Error).message}`);
         }
-        return this.browser!;
     }
 
     /**
@@ -153,5 +171,47 @@ export class BrowserManager {
      */
     async loadCookies(page: Page, filePath: string): Promise<void> {
         await loadCookies(page, filePath);
+    }
+
+
+    /**
+     * Sets the RecaptchaPlugin configuration.
+     * @param config - The configuration object for RecaptchaPlugin.
+     */
+    setRecaptchaConfig(config: { id: string; token: string }): void {
+        if (!config.id || !config.token) {
+            throw new Error('Recaptcha configuration requires both "id" and "token".');
+        }
+        this.recaptchaConfig = config;
+        puppeteer.use(
+            RecaptchaPlugin({
+                provider: config,
+                visualFeedback: true,
+            })
+        );
+        console.log('RecaptchaPlugin configured successfully.');
+    }
+
+    /**
+     * Validates whether the RecaptchaPlugin configuration is set.
+     * Throws an exception if not set.
+     */
+    private validateRecaptchaConfig(): void {
+        if (!this.recaptchaConfig) {
+            throw new Error(
+                'RecaptchaPlugin configuration is not set. Please call "setRecaptchaConfig()" to configure it.'
+            );
+        }
+    }
+
+    /**
+     * Solves CAPTCHAs on the current page.
+     * @param page - The Puppeteer page instance.
+     */
+    async handleCaptcha(page: Page): Promise<boolean> {
+        this.validateRecaptchaConfig(); // Ensure Recaptcha is configured
+
+        const result = await page.solveRecaptchas();
+        return !!result.solved;
     }
 }

@@ -1,6 +1,6 @@
 # Crawly Automation
 
-**Crawly Automation** is a lightweight, modular, and extensible web crawling framework built on top of Puppeteer. Whether you need to scrape data, automate browser interactions, or manage multiple requests efficiently, Crawly Automation simplifies the process.
+**Crawly Automation** is a lightweight, modular, and extensible web crawling framework built on top of Puppeteer. Whether you need to scrape data, automate browser interactions, manage CAPTCHAs, or handle advanced data extraction, Crawly Automation simplifies the process.
 
 ---
 
@@ -9,6 +9,8 @@
 - **Browser Management**: Launch, manage, and close browsers and pages with ease.
 - **Request Handling**: Intercept, filter, and modify network requests dynamically.
 - **Data Extraction**: Extract structured or unstructured data with customizable selectors.
+- **Data Formatting**: Convert extracted data to **JSON** or **CSV** with built-in utilities.
+- **CAPTCHA Handling**: Solve CAPTCHAs (reCAPTCHA) automatically using third-party services like 2Captcha.
 - **User Actions**: Simulate complex user interactions like single-page and multi-page logins, dropdown selection, file uploads, and more.
 - **Utilities**: Handy tools for delays, logging, and helper functions.
 
@@ -27,6 +29,8 @@ npm install crawly-automation
 ## 🔧 Usage
 
 Here’s a quick guide to get you started with Crawly Automation.
+
+---
 
 ### **1. Browser Management**
 
@@ -65,7 +69,7 @@ import { DataExtractor } from 'crawly-automation';
   await page.goto('https://example.com');
 
   const extractor = new DataExtractor();
-  extractor.addSelector('title', 'h1').addSelector('paragraphs', 'p', true);
+  extractor.addSelector('title', 'h1').addSelector('items', '.item', true);
 
   const data = await extractor.extract(page);
   console.log('Extracted Data:', data);
@@ -78,13 +82,84 @@ Output:
 ```json
 {
   "title": "Example Title",
-  "paragraphs": ["Paragraph 1", "Paragraph 2", "Paragraph 3"]
+  "items": ["Item 1", "Item 2", "Item 3"]
 }
 ```
 
 ---
 
-### **3. User Actions**
+### **3. Data Formatting (JSON and CSV)**
+
+Convert extracted data to **JSON** or **CSV** using built-in utilities:
+
+```typescript
+import { DataExtractor } from 'crawly-automation';
+
+(async () => {
+  const browserManager = new BrowserManager();
+  const browser = await browserManager.launchBrowser();
+  const page = await browserManager.createPage();
+
+  await page.goto('https://example.com');
+
+  const extractor = new DataExtractor();
+  extractor.addSelector('items', '.item', true);
+
+  const jsonData = await extractor.extractFormatted(page, 'json');
+  console.log('JSON Data:', jsonData);
+
+  const csvData = await extractor.extractFormatted(page, 'csv');
+  console.log('CSV Data:\n', csvData);
+
+  await browserManager.closeBrowser();
+})();
+```
+
+---
+
+### **4. CAPTCHA Handling**
+
+Solve CAPTCHAs (e.g., reCAPTCHA) automatically with 2Captcha or similar services:
+
+#### **Step 1: Configure CAPTCHA Solver**
+Set up the CAPTCHA solver with your API key:
+
+```typescript
+import { BrowserManager } from 'crawly-automation';
+
+const browserManager = new BrowserManager();
+
+// Configure RecaptchaPlugin
+browserManager.setRecaptchaConfig({
+    id: '2captcha',
+    token: 'YOUR_2CAPTCHA_API_KEY',
+});
+```
+
+#### **Step 2: Handle CAPTCHA**
+Handle CAPTCHAs during your crawling process:
+
+```typescript
+(async () => {
+  const browser = await browserManager.launchBrowser();
+  const page = await browser.newPage();
+
+  await page.goto('https://example.com');
+
+  try {
+      await browserManager.handleCaptcha(page);
+  } catch (error) {
+      console.error('CAPTCHA Handling Error:', error.message);
+  }
+
+  console.log('CAPTCHA solved, proceeding...');
+  await browserManager.closeBrowser();
+})();
+```
+
+---
+
+### **5. User Actions**
 
 Simulate user interactions like logging in or uploading a file:
 
@@ -108,53 +183,9 @@ import { UserActions } from 'crawly-automation';
 })();
 ```
 
-#### **Multi-Page Login**
-```typescript
-await userActions.multiPageLogin(
-  '#email', 
-  '#next-button', 
-  '#password', 
-  '#login-button', 
-  { email: 'user@example.com', password: 'securepassword' }
-);
-```
-
-#### **File Upload**
-```typescript
-await userActions.uploadFile('#file-input', './path/to/file.png');
-```
-
 ---
 
-### **4. Request Management**
-
-Intercept and analyze network requests:
-
-```typescript
-import { RequestManager } from 'crawly-automation';
-
-(async () => {
-  const browserManager = new BrowserManager();
-  const browser = await browserManager.launchBrowser();
-  const page = await browserManager.createPage();
-
-  const requestManager = new RequestManager(page);
-  await requestManager.interceptRequests();
-
-  // Navigate to a page
-  await page.goto('https://example.com');
-
-  // Get all captured requests
-  const requests = requestManager.getRequests();
-  console.log('Captured Requests:', requests);
-
-  await browserManager.closeBrowser();
-})();
-```
-
----
-
-### **5. Logging and Helpers**
+### **6. Logging and Helpers**
 
 #### **Logging**
 Use the built-in `Logger` utility for structured logs:
@@ -182,22 +213,14 @@ await delay(3000); // Wait for 3 seconds
 
 ### **BrowserManager**
 - `launchBrowser(options: PuppeteerLaunchOptions): Promise<Browser>`
-- `createPage(): Promise<Page>`
+- `setRecaptchaConfig(config: { id: string; token: string }): void`
+- `handleCaptcha(page: Page): Promise<boolean>`
 - `closeBrowser(): Promise<void>`
 
 ### **DataExtractor**
 - `addSelector(name: string, selector: string, multiple?: boolean): this`
 - `extract(page: Page): Promise<Record<string, any>>`
-- `extractAttributes(page: Page, selector: string, attribute: string): Promise<string[]>`
-
-### **UserActions**
-- `login(usernameSelector: string, passwordSelector: string, submitSelector: string, credentials: { username: string; password: string }): Promise<void>`
-- `multiPageLogin(emailSelector: string, emailSubmitSelector: string, passwordSelector: string, passwordSubmitSelector: string, credentials: { email: string; password: string }): Promise<void>`
-- `uploadFile(selector: string, filePath: string): Promise<void>`
-
-### **RequestManager**
-- `interceptRequests(): Promise<void>`
-- `getRequests(): Record<string, any>[]`
+- `extractFormatted(page: Page, format: 'json' | 'csv'): Promise<string>`
 
 ### **Utilities**
 - `Logger`: Structured logging (`info`, `warn`, `error`, `debug`)
